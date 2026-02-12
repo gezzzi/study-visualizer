@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(npm install:*)",
+      "Bash(npm run dev:*)",
+      "mcp__chrome-devtools__navigate_page",
+      "Bash(curl:*)",
+      "WebFetch(domain:ai.google.dev)",
+      "Bash(npm uninstall:*)",
+      "Bash(python3:*)",
+      "Bash(node -e:*)",
+      "Bash(tasklist:*)",
+      "Bash(taskkill:*)",
+      "Bash(npm run build:*)"
+    ]
+  }
+}
