@@ -1,10 +1,17 @@
-[2026/02/13  6:10:44.01] Starting... 
+[2026/02/15  5:46:48.23] Starting... 
 [OK] Node.js found 
 [OK] Changed to C:\Users\user\dev\study-visualizer\scripts\.. 
 [INFO] Starting server... 
 ▲ Next.js 16.1.6
-- Local:         http://localhost:54321
-- Network:       http://172.20.10.6:54321
+- Local:         http://localhost:4000
+- Network:       http://172.19.80.1:4000
 
 ✓ Starting...
-✓ Ready in 717ms
+✓ Ready in 1235ms
+[INFO] Waiting for server... (1/30
+[INFO] Waiting for server... (2/30
+[INFO] Waiting for server... (3/30
+[INFO] Waiting for server... (4/30
+[INFO] Waiting for server... (5/30
+[INFO] Waiting for server... (6/30
+[INFO] Waiting for server... (7/30

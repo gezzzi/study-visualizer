@@ -12,7 +12,11 @@
       "Bash(node -e:*)",
       "Bash(tasklist:*)",
       "Bash(taskkill:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(netstat:*)",
+      "Bash(WMIC PROCESS WHERE \"ProcessId=15716\" GET CommandLine,Name)",
+      "Bash(WMIC PROCESS WHERE \"ProcessId=8188\" GET CommandLine,Name)",
+      "mcp__chrome-devtools__list_console_messages"
     ]
   }
 }

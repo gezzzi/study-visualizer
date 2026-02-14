@@ -52,5 +52,13 @@ export interface StoredImage {
   storage_path: string;
   public_url: string;
   file_size_bytes: number | null;
+  folder_id: string | null;
   created_at: string;
+}
+
+export interface Folder {
+  id: string;
+  name: string;
+  created_at: string;
+  image_count?: number;
 }

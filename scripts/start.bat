@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 set "APP_DIR=%~dp0.."
-set "PORT=54321"
+set "PORT=4000"
 set "URL=http://localhost:%PORT%"
 set "LOG=%~dp0start.log"
 

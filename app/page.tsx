@@ -6,7 +6,6 @@ import ThemeSelector from "@/components/ui/ThemeSelector";
 import SizeSelector from "@/components/ui/SizeSelector";
 import ImagePreview from "@/components/ui/ImagePreview";
 import { GenerateButton, DownloadButton } from "@/components/ui/ExportButton";
-import Gallery from "@/components/ui/Gallery";
 
 const placeholder = `例:
 "break the ice" = 場の雰囲気を和ませる
@@ -45,7 +44,6 @@ export default function Home() {
       }
       setImageData(result.image);
       setMimeType(result.mimeType || "image/png");
-      window.dispatchEvent(new Event("gallery:refresh"));
     } catch {
       setError("通信エラーが発生しました");
     } finally {
@@ -54,75 +52,58 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-gray-200 bg-white">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <div className="flex h-14 items-center">
-            <h1 className="text-lg font-bold text-gray-900">
-              Study Visualizer
-            </h1>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Left: Input */}
-          <div className="space-y-4">
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">
-                メモの内容
-              </label>
-              <textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder={placeholder}
-                rows={14}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm leading-relaxed focus:border-gray-500 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">
-                スタイル
-              </label>
-              <ThemeSelector value={themeId} onChange={setThemeId} />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">
-                サイズ
-              </label>
-              <SizeSelector value={imageSize} onChange={setImageSize} />
-            </div>
-
-            <GenerateButton
-              onGenerate={handleGenerate}
-              loading={loading}
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Left: Input */}
+        <div className="space-y-4">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              メモの内容
+            </label>
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder={placeholder}
+              rows={14}
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm leading-relaxed focus:border-gray-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-gray-400"
             />
           </div>
 
-          {/* Right: Preview */}
-          <div className="space-y-4">
-            <ImagePreview
-              imageData={imageData}
-              mimeType={mimeType}
-              loading={loading}
-              error={error}
-            />
-            <DownloadButton
-              imageData={imageData}
-              mimeType={mimeType}
-              filename="study-memo"
-            />
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              スタイル
+            </label>
+            <ThemeSelector value={themeId} onChange={setThemeId} />
           </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              サイズ
+            </label>
+            <SizeSelector value={imageSize} onChange={setImageSize} />
+          </div>
+
+          <GenerateButton
+            onGenerate={handleGenerate}
+            loading={loading}
+          />
         </div>
 
-        {/* Gallery */}
-        <div className="mt-10 border-t border-gray-200 pt-8">
-          <Gallery />
+        {/* Right: Preview */}
+        <div className="space-y-4">
+          <ImagePreview
+            imageData={imageData}
+            mimeType={mimeType}
+            loading={loading}
+            error={error}
+          />
+          <DownloadButton
+            imageData={imageData}
+            mimeType={mimeType}
+            filename="study-memo"
+          />
         </div>
-      </main>
+      </div>
     </div>
   );
 }

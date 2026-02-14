@@ -26,8 +26,8 @@ export default function ThemeSelector({ value, onChange }: ThemeSelectorProps) {
           onClick={() => onChange(theme.id)}
           className={`rounded-lg border-2 px-3 py-1.5 text-sm font-medium transition-all ${
             value === theme.id
-              ? "border-gray-900 shadow-sm"
-              : "border-gray-200 hover:border-gray-400"
+              ? "border-gray-900 shadow-sm dark:border-gray-100"
+              : "border-gray-200 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-400"
           }`}
           style={{
             backgroundColor: themePreviewColors[theme.id],

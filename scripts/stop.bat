@@ -1,6 +1,6 @@
 @echo off
 
-set "PORT=54321"
+set "PORT=4000"
 
 echo [INFO] Searching for process on port %PORT%...
 
