@@ -160,7 +160,7 @@ export default function Gallery() {
   };
 
   const handleDeleteFolder = async (folder: Folder) => {
-    if (!confirm(`フォルダ「${folder.name}」を削除しますか？\n中の画像は未分類に移動されます。`)) return;
+    if (!confirm(`フォルダ「${folder.name}」を削除しますか？\n中の画像からこのフォルダが外れます。`)) return;
     const res = await fetch("/api/folders", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
@@ -189,7 +189,7 @@ export default function Gallery() {
         setImages((prev) => prev.filter((i) => i.id !== img.id));
         setTotal((prev) => prev - 1);
         setAllTotal((prev) => prev - 1);
-        if (!img.folder_id) setUncategorizedCount((prev) => prev - 1);
+        if (img.folder_ids.length === 0) setUncategorizedCount((prev) => prev - 1);
         if (selectedImage?.id === img.id) setSelectedImage(null);
         fetchFolders();
       }
@@ -200,32 +200,34 @@ export default function Gallery() {
     }
   };
 
-  const handleMoveImages = async (targetFolderId: string | null) => {
-    const ids = Array.from(selectedIds);
+  const handleToggleFolder = async (imageIds: string[], folderId: string, isCurrentlyIn: boolean) => {
     const res = await fetch("/api/images/move", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ imageIds: ids, folderId: targetFolderId }),
+      body: JSON.stringify({
+        imageIds,
+        folderId,
+        action: isCurrentlyIn ? "remove" : "add",
+      }),
     });
     if (res.ok) {
-      setSelectionMode(false);
-      setSelectedIds(new Set());
-      setMoveMenuOpen(false);
       refreshAll();
     }
   };
 
-  const handleSingleMove = async (img: StoredImage, targetFolderId: string | null) => {
-    const res = await fetch("/api/images/move", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ imageIds: [img.id], folderId: targetFolderId }),
-    });
-    if (res.ok) {
-      setSingleMoveMenuOpen(false);
-      setSelectedImage(null);
-      refreshAll();
-    }
+  const handleBulkToggleFolder = async (folderId: string) => {
+    const ids = Array.from(selectedIds);
+    await handleToggleFolder(ids, folderId, false);
+    setSelectionMode(false);
+    setSelectedIds(new Set());
+    setMoveMenuOpen(false);
+  };
+
+  const handleSingleToggleFolder = async (img: StoredImage, folderId: string) => {
+    const isIn = img.folder_ids.includes(folderId);
+    await handleToggleFolder([img.id], folderId, isIn);
+    setSingleMoveMenuOpen(false);
+    setSelectedImage(null);
   };
 
   const toggleSelection = (id: string) => {
@@ -396,20 +398,14 @@ export default function Gallery() {
               onClick={() => setMoveMenuOpen(!moveMenuOpen)}
               className="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
             >
-              フォルダに移動
+              フォルダに追加
             </button>
             {moveMenuOpen && (
               <div className="absolute bottom-full left-0 mb-2 min-w-[160px] rounded-lg border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-800">
-                <button
-                  onClick={() => handleMoveImages(null)}
-                  className="w-full px-3 py-2 text-left text-xs text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                >
-                  未分類に移動
-                </button>
                 {folders.map((f) => (
                   <button
                     key={f.id}
-                    onClick={() => handleMoveImages(f.id)}
+                    onClick={() => handleBulkToggleFolder(f.id)}
                     className="w-full px-3 py-2 text-left text-xs text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                   >
                     {f.name}
@@ -492,33 +488,35 @@ export default function Gallery() {
                     onClick={() => setSingleMoveMenuOpen(!singleMoveMenuOpen)}
                     className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                   >
-                    フォルダに移動
+                    フォルダ
                   </button>
                   {singleMoveMenuOpen && (
-                    <div className="absolute bottom-full left-0 mb-2 min-w-[160px] rounded-lg border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-800">
-                      <button
-                        onClick={() => handleSingleMove(selectedImage, null)}
-                        className={`w-full px-3 py-2 text-left text-xs hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                          !selectedImage.folder_id
-                            ? "font-bold text-gray-900 dark:text-gray-100"
-                            : "text-gray-700 dark:text-gray-300"
-                        }`}
-                      >
-                        未分類
-                      </button>
-                      {folders.map((f) => (
-                        <button
-                          key={f.id}
-                          onClick={() => handleSingleMove(selectedImage, f.id)}
-                          className={`w-full px-3 py-2 text-left text-xs hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                            selectedImage.folder_id === f.id
-                              ? "font-bold text-gray-900 dark:text-gray-100"
-                              : "text-gray-700 dark:text-gray-300"
-                          }`}
-                        >
-                          {f.name}
-                        </button>
-                      ))}
+                    <div className="absolute bottom-full left-0 mb-2 min-w-[180px] rounded-lg border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+                      {folders.map((f) => {
+                        const isIn = selectedImage.folder_ids.includes(f.id);
+                        return (
+                          <button
+                            key={f.id}
+                            onClick={() => handleSingleToggleFolder(selectedImage, f.id)}
+                            className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs hover:bg-gray-100 dark:hover:bg-gray-700"
+                          >
+                            <span className={`flex h-4 w-4 items-center justify-center rounded border ${
+                              isIn
+                                ? "border-blue-500 bg-blue-500 text-white"
+                                : "border-gray-300 dark:border-gray-600"
+                            }`}>
+                              {isIn && (
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                  <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                              )}
+                            </span>
+                            <span className={isIn ? "font-bold text-gray-900 dark:text-gray-100" : "text-gray-700 dark:text-gray-300"}>
+                              {f.name}
+                            </span>
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

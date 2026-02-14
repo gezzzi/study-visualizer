@@ -7,8 +7,8 @@ export async function GET() {
 
     const countMap: Record<string, number> = {};
     for (const img of db.images) {
-      if (img.folder_id) {
-        countMap[img.folder_id] = (countMap[img.folder_id] || 0) + 1;
+      for (const fid of img.folder_ids) {
+        countMap[fid] = (countMap[fid] || 0) + 1;
       }
     }
 
@@ -103,11 +103,9 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Move images in this folder to uncategorized
+    // Remove this folder from all images' folder_ids
     for (const img of db.images) {
-      if (img.folder_id === id) {
-        img.folder_id = null;
-      }
+      img.folder_ids = img.folder_ids.filter((fid) => fid !== id);
     }
 
     db.folders.splice(folderIndex, 1);

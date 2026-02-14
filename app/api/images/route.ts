@@ -15,9 +15,9 @@ export async function GET(request: NextRequest) {
     let filtered = db.images;
 
     if (folderId === "none") {
-      filtered = filtered.filter((img) => img.folder_id === null);
+      filtered = filtered.filter((img) => img.folder_ids.length === 0);
     } else if (folderId) {
-      filtered = filtered.filter((img) => img.folder_id === folderId);
+      filtered = filtered.filter((img) => img.folder_ids.includes(folderId));
     }
 
     filtered.sort(

@@ -38,7 +38,7 @@ function FolderMenu({
   return (
     <div
       ref={ref}
-      className="absolute right-0 top-full z-20 mt-1 w-32 rounded-lg border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-800"
+      className="absolute right-0 bottom-full z-20 mb-1 w-32 rounded-lg border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-800"
     >
       <button
         onClick={() => { onRename(); onClose(); }}
@@ -76,7 +76,7 @@ export default function FolderBar({
     }`;
 
   return (
-    <div className="mb-4 flex items-center gap-2 overflow-x-auto pb-1">
+    <div className="relative mb-4 flex flex-wrap items-center gap-2">
       {/* All */}
       <button
         onClick={() => onSelectFolder(null)}

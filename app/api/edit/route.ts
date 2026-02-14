@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
         storage_path: newStoragePath,
         public_url: publicUrl,
         file_size_bytes: buffer.length,
-        folder_id: original?.folder_id || null,
+        folder_ids: original?.folder_ids ?? [],
         created_at: now.toISOString(),
       });
       saveDb(db);

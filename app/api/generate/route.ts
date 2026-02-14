@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { GoogleGenAI } from "@google/genai";
 import { themes } from "@/lib/themes";
+import { genres } from "@/lib/genres";
 import { GenerateRequest } from "@/lib/types";
 import { buildPrompt } from "@/lib/prompts";
 import { getDb, saveDb, generateId, UPLOADS_DIR } from "@/lib/local-db";
@@ -12,11 +13,11 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as GenerateRequest;
-    const { content, themeId, imageSize } = body;
+    const { content, themeId, imageSize, genreId, instruction } = body;
 
-    if (!content?.trim()) {
+    if (!content?.trim() && !body.instruction?.trim()) {
       return NextResponse.json(
-        { error: "内容を入力してください" },
+        { error: "メモの内容または指示を入力してください" },
         { status: 400 }
       );
     }
@@ -29,7 +30,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const prompt = buildPrompt(content, theme, imageSize);
+    const genre = genreId ? genres[genreId] : undefined;
+    const prompt = buildPrompt(content, theme, imageSize, instruction, genre);
 
     const response = await ai.models.generateContent({
       model: "gemini-3-pro-image-preview",
@@ -78,7 +80,7 @@ export async function POST(request: NextRequest) {
         storage_path: storagePath,
         public_url: publicUrl,
         file_size_bytes: buffer.length,
-        folder_id: null,
+        folder_ids: genre?.folderId ? [genre.folderId] : [],
         created_at: now.toISOString(),
       });
       saveDb(db);

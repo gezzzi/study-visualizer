@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ThemeId, ImageSize } from "@/lib/types";
+import { ThemeId, ImageSize, GenreId } from "@/lib/types";
+import GenreSelector from "@/components/ui/GenreSelector";
 import ThemeSelector from "@/components/ui/ThemeSelector";
 import SizeSelector from "@/components/ui/SizeSelector";
 import ImagePreview from "@/components/ui/ImagePreview";
@@ -11,15 +12,12 @@ const placeholder = `例:
 "break the ice" = 場の雰囲気を和ませる
 
 直訳: 氷を割る
-実際の意味: 初対面の人と打ち解ける
-
-例文: He told a joke to break the ice.
-（彼は場を和ませるために冗談を言った）
-
-💡 初対面や緊張した場面で使える！`;
+実際の意味: 初対面の人と打ち解ける`;
 
 export default function Home() {
   const [content, setContent] = useState("");
+  const [instruction, setInstruction] = useState("");
+  const [genreId, setGenreId] = useState<GenreId>("general");
   const [themeId, setThemeId] = useState<ThemeId>("notebook");
   const [imageSize, setImageSize] = useState<ImageSize>("1:1");
   const [imageData, setImageData] = useState<string | null>(null);
@@ -28,14 +26,14 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
 
   const handleGenerate = async () => {
-    if (!content.trim()) return;
+    if (!content.trim() && !instruction.trim()) return;
     setLoading(true);
     setError(null);
     try {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content, themeId, imageSize }),
+        body: JSON.stringify({ content, themeId, imageSize, genreId, instruction: instruction.trim() || undefined }),
       });
       const result = await res.json();
       if (!res.ok) {
@@ -58,15 +56,38 @@ export default function Home() {
         <div className="space-y-4">
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              メモの内容
+              メモの内容（任意）
             </label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder={placeholder}
-              rows={14}
+              rows={5}
               className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm leading-relaxed focus:border-gray-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-gray-400"
             />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              指示（任意）
+            </label>
+            <textarea
+              value={instruction}
+              onChange={(e) => setInstruction(e.target.value)}
+              placeholder="例: 手書き文字をもっと大きくしてください、背景を暖色系にしてください"
+              rows={5}
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm leading-relaxed focus:border-gray-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-gray-400"
+            />
+            <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+              画像の生成方法に関する指示です。この内容は画像には表示されません。
+            </p>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              ジャンル
+            </label>
+            <GenreSelector value={genreId} onChange={setGenreId} />
           </div>
 
           <div>

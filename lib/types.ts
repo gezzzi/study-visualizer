@@ -1,3 +1,12 @@
+export type GenreId = "general" | "toeic" | "fe-exam" | "takken" | "denki2" | "bookkeeping";
+
+export interface Genre {
+  id: GenreId;
+  name: string;
+  promptDescription: string;
+  folderId?: string;
+}
+
 export type ThemeId =
   | "notebook"
   | "blackboard"
@@ -32,6 +41,8 @@ export interface GenerateRequest {
   content: string;
   themeId: ThemeId;
   imageSize: ImageSize;
+  genreId?: GenreId;
+  instruction?: string;
 }
 
 export interface GenerateResponse {
@@ -52,7 +63,7 @@ export interface StoredImage {
   storage_path: string;
   public_url: string;
   file_size_bytes: number | null;
-  folder_id: string | null;
+  folder_ids: string[];
   created_at: string;
 }
 
