@@ -25,12 +25,6 @@ if not exist "node_modules" (
     call npm install >> "%LOG%" 2>&1
 )
 
-:: Check build
-if not exist ".next" (
-    echo [INFO] Building... >> "%LOG%"
-    call npm run build >> "%LOG%" 2>&1
-)
-
 :: Check if server is already running
 netstat -ano | findstr ":%PORT% " | findstr "LISTENING" >nul 2>&1
 if not errorlevel 1 (
@@ -38,14 +32,20 @@ if not errorlevel 1 (
     goto :open_browser
 )
 
-:: Start server in background
-echo [INFO] Starting server... >> "%LOG%"
-start "" /b cmd /c "cd /d "%APP_DIR%" && npx next start -p %PORT% >> "%LOG%" 2>&1"
+:: Clean up stale lock file before starting dev server
+if exist ".next\dev\lock" (
+    echo [INFO] Removing stale lock file... >> "%LOG%"
+    del /f ".next\dev\lock" >nul 2>&1
+)
 
-:: Wait for server to respond (max 30s)
+:: Start dev server in background
+echo [INFO] Starting dev server... >> "%LOG%"
+start "" /b cmd /c "cd /d "%APP_DIR%" && npx next dev -p %PORT% >> "%LOG%" 2>&1"
+
+:: Wait for server to respond (max 60s)
 set /a "tries=0"
 :wait_loop
-if !tries! geq 30 (
+if !tries! geq 60 (
     echo [ERROR] Server start timeout >> "%LOG%"
     exit /b 1
 )
@@ -55,7 +55,7 @@ timeout /t 1 /nobreak >nul
 powershell -Command "try { $r = Invoke-WebRequest -Uri '%URL%' -UseBasicParsing -TimeoutSec 2; exit 0 } catch { exit 1 }" >nul 2>&1
 if errorlevel 1 (
     set /a "tries+=1"
-    echo [INFO] Waiting for server... (!tries!/30) >> "%LOG%"
+    echo [INFO] Waiting for server... (!tries!/60) >> "%LOG%"
     goto :wait_loop
 )
 

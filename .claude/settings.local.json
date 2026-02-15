@@ -16,7 +16,8 @@
       "Bash(netstat:*)",
       "Bash(WMIC PROCESS WHERE \"ProcessId=15716\" GET CommandLine,Name)",
       "Bash(WMIC PROCESS WHERE \"ProcessId=8188\" GET CommandLine,Name)",
-      "mcp__chrome-devtools__list_console_messages"
+      "mcp__chrome-devtools__list_console_messages",
+      "mcp__ide__getDiagnostics"
     ]
   }
 }

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ThemeId, ImageSize, GenreId } from "@/lib/types";
-import GenreSelector from "@/components/ui/GenreSelector";
+import { ThemeId, ImageSize, EnglishLevel } from "@/lib/types";
+import EnglishLevelSelector from "@/components/ui/EnglishLevelSelector";
 import ThemeSelector from "@/components/ui/ThemeSelector";
 import SizeSelector from "@/components/ui/SizeSelector";
 import ImagePreview from "@/components/ui/ImagePreview";
@@ -17,7 +17,7 @@ const placeholder = `例:
 export default function Home() {
   const [content, setContent] = useState("");
   const [instruction, setInstruction] = useState("");
-  const [genreId, setGenreId] = useState<GenreId>("general");
+  const [englishLevel, setEnglishLevel] = useState<EnglishLevel>("medium");
   const [themeId, setThemeId] = useState<ThemeId>("notebook");
   const [imageSize, setImageSize] = useState<ImageSize>("1:1");
   const [imageData, setImageData] = useState<string | null>(null);
@@ -33,7 +33,7 @@ export default function Home() {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content, themeId, imageSize, genreId, instruction: instruction.trim() || undefined }),
+        body: JSON.stringify({ content, themeId, imageSize, englishLevel, instruction: instruction.trim() || undefined }),
       });
       const result = await res.json();
       if (!res.ok) {
@@ -85,9 +85,9 @@ export default function Home() {
 
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              ジャンル
+              英語の量
             </label>
-            <GenreSelector value={genreId} onChange={setGenreId} />
+            <EnglishLevelSelector value={englishLevel} onChange={setEnglishLevel} />
           </div>
 
           <div>

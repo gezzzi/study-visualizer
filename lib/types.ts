@@ -1,12 +1,3 @@
-export type GenreId = "general" | "toeic" | "fe-exam" | "takken" | "denki2" | "bookkeeping";
-
-export interface Genre {
-  id: GenreId;
-  name: string;
-  promptDescription: string;
-  folderId?: string;
-}
-
 export type ThemeId =
   | "notebook"
   | "blackboard"
@@ -22,6 +13,8 @@ export interface CardTheme {
 }
 
 export type ImageSize = "1:1" | "4:3" | "3:4" | "16:9" | "9:16";
+
+export type EnglishLevel = "none" | "low" | "medium";
 
 export interface ImageSizeOption {
   id: ImageSize;
@@ -41,8 +34,8 @@ export interface GenerateRequest {
   content: string;
   themeId: ThemeId;
   imageSize: ImageSize;
-  genreId?: GenreId;
   instruction?: string;
+  englishLevel?: EnglishLevel;
 }
 
 export interface GenerateResponse {

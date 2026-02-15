@@ -1,43 +1,56 @@
-import { CardTheme, Genre, ImageSize } from "./types";
+import { CardTheme, EnglishLevel, ImageSize } from "./types";
 
 const aspectRatioDescriptions: Record<ImageSize, string> = {
-  "1:1": "a square (1:1 aspect ratio)",
-  "4:3": "a landscape 4:3 aspect ratio (wider than tall)",
-  "16:9": "a wide landscape 16:9 aspect ratio (much wider than tall)",
-  "3:4": "a portrait 3:4 aspect ratio (taller than wide)",
-  "9:16": "a tall portrait 9:16 aspect ratio (much taller than wide)",
+  "1:1": "正方形（1:1）",
+  "4:3": "横長 4:3（横が長い）",
+  "16:9": "ワイド横長 16:9（かなり横長）",
+  "3:4": "縦長 3:4（縦が長い）",
+  "9:16": "縦長 9:16（かなり縦長）",
 };
 
-export function buildPrompt(content: string, theme: CardTheme, imageSize: ImageSize = "1:1", instruction?: string, genre?: Genre): string {
-  const sizeDesc = aspectRatioDescriptions[imageSize] || "a square (1:1 aspect ratio)";
-  const subjectDesc = genre && genre.id !== "general"
-    ? genre.promptDescription
-    : "study notes";
-  let prompt = `Create ${sizeDesc} image of a handwritten ${subjectDesc} for social media (like Twitter/X). The image should look like someone's real study notes - casual, authentic, and visually engaging.
+const englishLevelInstructions: Record<EnglishLevel, string> = {
+  none: `- 画像内のテキストはすべて日本語で書くこと。英語は一切使わないこと
+- 専門用語も日本語で表記すること`,
+  low: `- 画像内のテキストは日本語を主体にすること（全体の85〜90%は日本語で書く）
+- 英語のキーワードは控えめに使う（全体の10〜15%程度）
+- 日本語の見出しや説明文を中心に、英語のキーワードを少しだけアクセントとして使う`,
+  medium: `- 画像内のテキストは日本語を主体にすること（全体の70〜80%は日本語で書く）
+- 英語のキーワードや専門用語は適度に混ぜてOK（全体の20〜30%程度）。英語の重要単語は大きく太く目立たせる
+- 日本語の見出しや説明文を中心に、英語のキーワードをアクセントとして使うバランスにする`,
+};
 
-Visual style: ${theme.promptDescription}
+export function buildPrompt(content: string, theme: CardTheme, imageSize: ImageSize = "1:1", instruction?: string, englishLevel: EnglishLevel = "medium"): string {
+  const sizeDesc = aspectRatioDescriptions[imageSize] || "正方形（1:1）";
+  let prompt = `${sizeDesc}の手書き風の勉強ノートの画像を生成してください。SNS（Twitter/X）で映えるような、本物の勉強ノートのようなカジュアルで親しみやすいデザインにしてください。日本人の学生が書いたノートのイメージです。
+
+ビジュアルスタイル: ${theme.promptDescription}
 `;
 
   if (content.trim()) {
     prompt += `
-Content to include in the memo (write this text EXACTLY as provided, do not change or omit any characters):
+ノートに書く内容（以下のテキストを正確にそのまま書いてください。一文字も変えないでください）:
 ${content}
 `;
   }
 
   prompt += `
-Important rules:
-- All text must be handwritten style, NOT typed/digital font${content.trim() ? "\n- Write the text EXACTLY as provided above - every word, every character must appear accurately including Japanese characters" : ""}
-- Use visual hierarchy: make key English words/phrases bigger and bolder
-- Add hand-drawn decorations like underlines, circles, arrows, stars, or simple doodles to make it eye-catching
-- The overall feel should be like a real student's study notes that someone would want to save or share
-- Make it visually dense but not cluttered - the kind of aesthetic study notes that go viral on social media
-- Keep the layout natural and organic, not rigid or grid-like`;
+重要なルール:
+- すべてのテキストは手書き風にすること（デジタルフォントは使わない）${content.trim() ? "\n- 上記のテキストを一字一句正確に書くこと（日本語の文字も正確に再現すること）" : ""}
+${englishLevelInstructions[englishLevel]}
+- 図やイラストを多めに入れること（全体の40〜50%は図解やイラストにする）。例: フローチャート、関係図、概念図、簡単な表、手書きのアイコン、吹き出し、比較図、ツリー図など
+- テキストだけでなく、視覚的に理解しやすい図解を積極的に使い、文字と図のバランスを取ること
+- 手書きの装飾を加える（下線、丸囲み、矢印、星マーク、簡単なイラスト、吹き出しなど）
+- 本物の学生のノートのような雰囲気にする（SNSで保存・シェアしたくなるような見た目）
+- 情報量は多めだが、図解を活用して見やすく整理する（SNSでバズるような美しい勉強ノート）
+- レイアウトは自然で有機的に（硬いグリッド状にしない）
+- 余白を効果的に使うこと。要素同士の間に適度なスペースを空け、詰め込みすぎない。余白があることで各要素が際立ち、全体が見やすくなる
+- ノートの端（上下左右）にも適度な余白を残し、画像全体のバランスを整えること
+- 「ビジュアルスタイル」の説明文そのものは画像内に絶対に書かないこと。これはあくまで画像の雰囲気や方向性の指示であり、画像に表示するテキストではない`;
 
   if (instruction?.trim()) {
     prompt += `
 
-Additional instructions from the user (follow these but do NOT include this instruction text in the image):
+ユーザーからの追加指示（この指示文自体は画像に含めないこと）:
 ${instruction.trim()}`;
   }
 
